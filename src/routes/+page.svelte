@@ -1,9 +1,13 @@
 <script lang="ts">
 	import Logo from '$assets/logo.svg';
 	import { Button } from '$components/button';
-	import { APP_NAME } from '$lib';
+	import { APP_NAME, getPageTitle } from '$lib';
 	import { ArrowRight, Video } from 'lucide-svelte';
 </script>
+
+<svelte:head>
+	<title>{getPageTitle('Embrace the financial arena with an engaging spirit')}</title>
+</svelte:head>
 
 <section class="min-h-screen flex items-center">
 	<div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">

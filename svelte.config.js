@@ -12,8 +12,7 @@ const config = {
 		alias: {
 			'$assets/*': './src/assets/*',
 			$components: './src/components',
-			$hooks: './src/hooks',
-			'$features/*': './src/features/*'
+			$hooks: './src/hooks'
 		}
 	}
 };

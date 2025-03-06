@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { getPageTitle } from '$lib';
+	import { APP_NAME, getPageTitle } from '$lib';
 	import { applyAction } from '$app/forms';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -8,10 +8,10 @@
 	import { Label } from '$components/label';
 	import { Checkbox } from '$components/checkbox';
 	import { Spinner } from '$components/spinner';
+	import { toast } from 'svelte-sonner';
+	import { signUpSchema } from '$lib/user/validator';
 	import { Card, CardContent, CardHeader, CardTitle } from '$components/card';
 	import { FormButton, FormControl, FormField, FormFieldErrors, FormLabel } from '$components/form';
-	import { toast } from 'svelte-sonner';
-	import { signInSchema } from '$lib/user/validator';
 	import ShowPasswordButton from '$components/show-password-button.svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -19,8 +19,9 @@
 	let showPassword = $state(false);
 
 	const form = superForm(data.form, {
-		validators: zodClient(signInSchema),
+		validators: zodClient(signUpSchema),
 		onUpdated({ form }) {
+			console.log(form.message);
 			if (!form.valid) {
 				toast.error(form.message);
 			}
@@ -28,26 +29,44 @@
 		onResult: async ({ result }) => {
 			if (result.type === 'redirect') {
 				await applyAction(result);
-				toast.success('We are glad you are back');
+				toast.success(`Welcome to ${APP_NAME}`);
 				return;
 			}
 		}
 	});
-
 	const { form: formData, enhance, delayed } = form;
 </script>
 
 <svelte:head>
-	<title>{getPageTitle('Sign in to your account')}</title>
+	<title>{getPageTitle('Create an account')}</title>
 </svelte:head>
 
 <Card>
 	<CardHeader>
-		<CardTitle class="text-center text-2xl font-bold">Sign in to your account</CardTitle>
+		<CardTitle class="text-center text-2xl font-bold">Create an account</CardTitle>
 	</CardHeader>
 
 	<CardContent>
 		<form method="POST" class="space-y-4 md:space-y-6" use:enhance>
+			<FormField {form} name="name">
+				<FormControl>
+					{#snippet children({ props })}
+						<FormLabel class="text-gray-800 dark:text-white text-sm mb-2 block">Your name</FormLabel
+						>
+						<Input
+							{...props}
+							bind:value={$formData.name}
+							type="text"
+							required
+							placeholder="Enter your name"
+							autocomplete="off"
+							disabled={$delayed}
+						/>
+					{/snippet}
+				</FormControl>
+				<FormFieldErrors />
+			</FormField>
+
 			<FormField {form} name="email">
 				<FormControl>
 					{#snippet children({ props })}
@@ -89,21 +108,18 @@
 				<FormFieldErrors />
 			</FormField>
 
-			<div class="flex flex-wrap items-center justify-between gap-4">
-				<div class="flex items-center text-sm">
-					<Checkbox id="remember-me" disabled={$delayed} />
-					<Label for="remember-me" class="ml-3 font-normal">Remember me</Label>
-				</div>
-				<div class="text-sm">
-					<a href={'#'} class="text-primary hover:underline font-semibold">
-						Forgot your password?
-					</a>
-				</div>
+			<div class="flex items-center">
+				<Checkbox id="terms" disabled={$delayed} />
+				<Label for="terms" class="ml-3 font-normal text-sm"
+					>I accept the <a href={'#'} class="text-primary font-semibold hover:underline ml-1"
+						>Terms and Conditions</a
+					></Label
+				>
 			</div>
 
 			<div class="mt-8">
 				<FormButton class="w-full rounded-lg" disabled={$delayed}
-					>Sign in
+					>Create an account
 					{#if $delayed}
 						<Spinner class="ml-1" />
 					{/if}
@@ -111,9 +127,9 @@
 			</div>
 
 			<p class="text-gray-800 dark:text-white text-sm mt-8 text-center">
-				Don't have an account? <a
-					href="/sign-up"
-					class="text-primary hover:underline ml-1 whitespace-nowrap font-semibold">Register here</a
+				Already have an account? <a
+					href="/sign-in"
+					class="text-primary hover:underline ml-1 whitespace-nowrap font-semibold">Login here</a
 				>
 			</p>
 		</form>
