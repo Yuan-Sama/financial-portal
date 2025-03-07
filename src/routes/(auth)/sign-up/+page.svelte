@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { APP_NAME, getPageTitle } from '$lib';
 	import { applyAction } from '$app/forms';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -11,8 +10,16 @@
 	import { toast } from 'svelte-sonner';
 	import { signUpSchema } from '$lib/user/validator';
 	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
-	import { FormButton, FormControl, FormField, FormFieldErrors, FormLabel } from '$components/ui/form';
+	import {
+		FormButton,
+		FormControl,
+		FormField,
+		FormFieldErrors,
+		FormLabel
+	} from '$components/ui/form';
 	import ShowPasswordButton from '$components/show-password-button.svelte';
+	import Metadata from '$components/metadata.svelte';
+	import { PUBLIC_APP_NAME } from '$env/static/public';
 
 	let { data }: { data: PageData } = $props();
 
@@ -28,7 +35,7 @@
 		onResult: async ({ result }) => {
 			if (result.type === 'redirect') {
 				await applyAction(result);
-				toast.success(`Welcome to ${APP_NAME}`);
+				toast.success(`Welcome to ${PUBLIC_APP_NAME}`);
 				return;
 			}
 		}
@@ -36,9 +43,7 @@
 	const { form: formData, enhance, delayed } = form;
 </script>
 
-<svelte:head>
-	<title>{getPageTitle('Create an account')}</title>
-</svelte:head>
+<Metadata title="Create an account" />
 
 <Card>
 	<CardHeader>

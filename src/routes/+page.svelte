@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import Logo from '$assets/logo.svg';
 	import Metadata from '$components/metadata.svelte';
 	import { Button } from '$components/ui/button';
@@ -9,8 +8,6 @@
 	const title = 'Embrace the financial arena with an engaging spirit';
 	const description =
 		'The path to financial freedom starts with a single step. Take that step into the portal of finance and let inspiration be your compass';
-
-	console.log(page);
 </script>
 
 <Metadata {title} />

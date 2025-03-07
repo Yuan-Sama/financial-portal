@@ -1,9 +1,9 @@
 import type { User } from '$lib/user/types';
 import type { Cookies } from '@sveltejs/kit';
 import * as jose from 'jose';
-import { APP_NAME } from '$lib';
 import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db';
+import { PUBLIC_APP_NAME } from '$env/static/public';
 
 /**
  * @see {@link https://github.com/panva/jose/issues/210#jws-alg Algorithm Key Requirements}
@@ -18,8 +18,8 @@ export async function createAccessToken(user: User, expiresAt: Date) {
 	return new jose.SignJWT({ id: user.id })
 		.setProtectedHeader({ alg })
 		.setIssuedAt()
-		.setIssuer(APP_NAME)
-		.setAudience(APP_NAME)
+		.setIssuer(PUBLIC_APP_NAME)
+		.setAudience(PUBLIC_APP_NAME)
 		.setExpirationTime(expiresAt)
 		.sign(secret);
 }
@@ -31,8 +31,8 @@ export async function authenticate(cookies: Cookies) {
 
 	try {
 		const verifiedToken = await jose.jwtVerify(token, secret, {
-			issuer: APP_NAME,
-			audience: APP_NAME
+			issuer: PUBLIC_APP_NAME,
+			audience: PUBLIC_APP_NAME
 		});
 
 		const userId = verifiedToken.payload.id as number;

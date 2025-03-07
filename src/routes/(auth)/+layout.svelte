@@ -1,9 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
-
 	import Logo from '$assets/logo.svg';
-	import { APP_NAME } from '$lib';
+	import { PUBLIC_APP_NAME } from '$env/static/public';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 </script>
@@ -13,7 +12,7 @@
 		<a href="/" class="flex items-center mb-8 justify-center">
 			<img class="h-8 w-12" src={Logo} alt="logo" />
 			<span class="ml-2.5 text-2xl font-semibold dark:text-white text-gray-800">
-				{APP_NAME}
+				{PUBLIC_APP_NAME}
 			</span>
 		</a>
 

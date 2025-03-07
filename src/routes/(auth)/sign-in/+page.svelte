@@ -1,20 +1,33 @@
-<script lang="ts">
+<script lang="ts" module>
 	import type { PageData } from './$types';
-	import { getPageTitle } from '$lib';
-	import { applyAction } from '$app/forms';
+
+	interface Props {
+		data: PageData;
+	}
+</script>
+
+<script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { Input } from '$components/ui/input';
-	import { Label } from '$components/ui/label';
-	import { Checkbox } from '$components/ui/checkbox';
-	import { Spinner } from '$components/spinner';
-	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
-	import { FormButton, FormControl, FormField, FormFieldErrors, FormLabel } from '$components/ui/form';
 	import { toast } from 'svelte-sonner';
+	import { applyAction } from '$app/forms';
 	import { signInSchema } from '$lib/user/validator';
+	import Spinner from '$components/spinner/spinner.svelte';
+	import Metadata from '$components/metadata.svelte';
+	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
+	import {
+		FormButton,
+		FormControl,
+		FormField,
+		FormFieldErrors,
+		FormLabel
+	} from '$components/ui/form';
+	import { Input } from '$components/ui/input';
+	import { Checkbox } from '$components/ui/checkbox';
+	import { Label } from '$components/ui/label';
 	import ShowPasswordButton from '$components/show-password-button.svelte';
 
-	let { data }: { data: PageData } = $props();
+	let { data }: Props = $props();
 
 	let showPassword = $state(false);
 
@@ -37,9 +50,7 @@
 	const { form: formData, enhance, delayed } = form;
 </script>
 
-<svelte:head>
-	<title>{getPageTitle('Sign in to your account')}</title>
-</svelte:head>
+<Metadata title="Sign in to your account" />
 
 <Card>
 	<CardHeader>
@@ -50,7 +61,7 @@
 		<form method="POST" class="space-y-4 md:space-y-6" use:enhance>
 			<FormField {form} name="email">
 				<FormControl>
-					{#snippet children({ /uiprops })}
+					{#snippet children({ props })}
 						<FormLabel class="text-gray-800 dark:text-white text-sm mb-2 block"
 							>Your email</FormLabel
 						>

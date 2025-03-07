@@ -1,12 +1,12 @@
 <script>
 	import Logo from '$assets/logo.svg';
 	import { page } from '$app/state';
-	import { APP_NAME } from '$lib';
+	import { PUBLIC_APP_NAME } from '$env/static/public';
 </script>
 
 <svelte:head>
 	<link rel="shortcut icon" href={Logo} type="image/svg" />
-	<title>{page.status}{page.error ? ` | ${page.error.message}` : ''} - {APP_NAME}</title>
+	<title>{page.status}{page.error ? ` | ${page.error.message}` : ''} - {PUBLIC_APP_NAME}</title>
 </svelte:head>
 
 <section class="flex min-h-screen items-center bg-white dark:bg-gray-900">
