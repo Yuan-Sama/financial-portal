@@ -14,6 +14,18 @@
 	--color-background: hsl(var(--background));
 	--color-foreground: hsl(var(--foreground));
 
+	--color-primary-50: #eff6ff;
+	--color-primary-100: #dbeafe;
+	--color-primary-200: #bfdbfe;
+	--color-primary-300: #93c5fd;
+	--color-primary-400: #60a6fa;
+	--color-primary-500: #3b83f6;
+	--color-primary-600: hsl(var(--primary));
+	--color-primary-700: #1d4fd8;
+	--color-primary-800: #1e41af;
+	--color-primary-900: #1e3a8a;
+	--color-primary-950: #172554;
+
 	--color-primary: hsl(var(--primary));
 	--color-primary-foreground: hsl(var(--primary-foreground));
 
