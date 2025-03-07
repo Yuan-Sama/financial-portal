@@ -2,7 +2,7 @@ import type { User } from '$lib/user/types';
 import type { Cookies } from '@sveltejs/kit';
 import * as jose from 'jose';
 import { env } from '$env/dynamic/private';
-import { db } from '$lib/server/db';
+import { db } from '$lib/db/server';
 import { PUBLIC_APP_NAME } from '$env/static/public';
 
 /**
@@ -37,7 +37,11 @@ export async function authenticate(cookies: Cookies) {
 
 		const userId = verifiedToken.payload.id as number;
 
-		return db.selectFrom('users').where('id', '=', userId).selectAll().executeTakeFirst();
+		return db
+			.selectFrom('users')
+			.where('id', '=', userId)
+			.select(['id', 'name', 'username'])
+			.executeTakeFirst();
 	} catch (err) {
 		console.error('validateAuthToken():', err);
 	}

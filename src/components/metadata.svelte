@@ -15,7 +15,7 @@
 
 	const siteName = PUBLIC_APP_NAME;
 	let imageUrl = $derived(`${page.url.origin}/${image}`);
-	let currentUrl = $derived(`${page.url.origin}/${page.url.pathname}`);
+	let currentUrl = $derived(`${page.url.origin}${page.url.pathname}`);
 </script>
 
 <svelte:head>

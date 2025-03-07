@@ -1,6 +1,6 @@
 import type { User } from './types';
 import bcrypt from 'bcrypt';
-import { db } from '$lib/server/db';
+import { db } from '$lib/db/server';
 
 export async function getUserByUsername(username: string) {
 	return db.selectFrom('users').where('username', '=', username).selectAll().executeTakeFirst();
