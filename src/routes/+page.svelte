@@ -1,26 +1,31 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import Logo from '$assets/logo.svg';
-	import { Button } from '$components/button';
-	import { APP_NAME, getPageTitle } from '$lib';
+	import Metadata from '$components/metadata.svelte';
+	import { Button } from '$components/ui/button';
+	import { PUBLIC_APP_NAME } from '$env/static/public';
 	import { ArrowRight, Video } from 'lucide-svelte';
+
+	const title = 'Embrace the financial arena with an engaging spirit';
+	const description =
+		'The path to financial freedom starts with a single step. Take that step into the portal of finance and let inspiration be your compass';
+
+	console.log(page);
 </script>
 
-<svelte:head>
-	<title>{getPageTitle('Embrace the financial arena with an engaging spirit')}</title>
-</svelte:head>
+<Metadata {title} />
 
 <section class="min-h-screen flex items-center">
 	<div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
 		<h1
 			class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
 		>
-			Engage with your finances like never before.
+			{`${title}.`}
 		</h1>
 		<p
 			class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400"
 		>
-			The path to financial freedom starts with a single step. Take that step into the portal of
-			finance and let inspiration be your compass.
+			{`${description}.`}
 		</p>
 		<div
 			class="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4"
@@ -194,7 +199,7 @@
 	<div class="mx-auto max-w-screen-xl text-center">
 		<a href="/" class="flex justify-center items-center text-2xl font-semibold">
 			<img src={Logo} alt="Logo" class="mr-2 h-8" />
-			{APP_NAME}
+			{PUBLIC_APP_NAME}
 		</a>
 		<p class="my-6 text-gray-500 dark:text-gray-400">
 			In the finance world, saving is like dieting - it's all fun and games until you see a cupcake
@@ -215,8 +220,8 @@
 			</li>
 		</ul>
 		<span class="text-sm text-gray-500 sm:text-center dark:text-gray-400"
-			>© 2020-{new Date().getFullYear()} <a href="/" class="hover:underline">{APP_NAME}™</a>. All
-			Rights Reserved.</span
+			>© 2020-{new Date().getFullYear()}
+			<a href="/" class="hover:underline">{PUBLIC_APP_NAME}™</a>. All Rights Reserved.</span
 		>
 	</div>
 </footer>

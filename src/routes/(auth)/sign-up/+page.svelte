@@ -4,14 +4,14 @@
 	import { applyAction } from '$app/forms';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { Input } from '$components/input';
-	import { Label } from '$components/label';
-	import { Checkbox } from '$components/checkbox';
+	import { Input } from '$components/ui/input';
+	import { Label } from '$components/ui/label';
+	import { Checkbox } from '$components/ui/checkbox';
 	import { Spinner } from '$components/spinner';
 	import { toast } from 'svelte-sonner';
 	import { signUpSchema } from '$lib/user/validator';
-	import { Card, CardContent, CardHeader, CardTitle } from '$components/card';
-	import { FormButton, FormControl, FormField, FormFieldErrors, FormLabel } from '$components/form';
+	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
+	import { FormButton, FormControl, FormField, FormFieldErrors, FormLabel } from '$components/ui/form';
 	import ShowPasswordButton from '$components/show-password-button.svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -21,7 +21,6 @@
 	const form = superForm(data.form, {
 		validators: zodClient(signUpSchema),
 		onUpdated({ form }) {
-			console.log(form.message);
 			if (!form.valid) {
 				toast.error(form.message);
 			}

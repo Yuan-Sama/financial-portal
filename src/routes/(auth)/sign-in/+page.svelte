@@ -4,12 +4,12 @@
 	import { applyAction } from '$app/forms';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { Input } from '$components/input';
-	import { Label } from '$components/label';
-	import { Checkbox } from '$components/checkbox';
+	import { Input } from '$components/ui/input';
+	import { Label } from '$components/ui/label';
+	import { Checkbox } from '$components/ui/checkbox';
 	import { Spinner } from '$components/spinner';
-	import { Card, CardContent, CardHeader, CardTitle } from '$components/card';
-	import { FormButton, FormControl, FormField, FormFieldErrors, FormLabel } from '$components/form';
+	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
+	import { FormButton, FormControl, FormField, FormFieldErrors, FormLabel } from '$components/ui/form';
 	import { toast } from 'svelte-sonner';
 	import { signInSchema } from '$lib/user/validator';
 	import ShowPasswordButton from '$components/show-password-button.svelte';
@@ -50,7 +50,7 @@
 		<form method="POST" class="space-y-4 md:space-y-6" use:enhance>
 			<FormField {form} name="email">
 				<FormControl>
-					{#snippet children({ props })}
+					{#snippet children({ /uiprops })}
 						<FormLabel class="text-gray-800 dark:text-white text-sm mb-2 block"
 							>Your email</FormLabel
 						>
