@@ -1,7 +1,19 @@
-<script>
+<script lang="ts" module>
+	import type { LayoutServerData } from './$types';
+
+	interface Props {
+		data: LayoutServerData;
+	}
+</script>
+
+<script lang="ts">
 	import Logo from '$assets/logo.svg';
 	import { page } from '$app/state';
 	import { PUBLIC_APP_NAME } from '$env/static/public';
+
+	let { data }: Props = $props();
+
+	const { authenticated } = data;
 </script>
 
 <svelte:head>
@@ -32,9 +44,9 @@
 				{/if}
 			</p>
 			<a
-				href="/"
+				href={authenticated ? '/dashboard' : '/'}
 				class="my-4 inline-flex rounded-lg bg-primary-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:outline-hidden focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900"
-				>Back to Homepage</a
+				>Back to {authenticated ? 'Dashboard' : 'Home'}</a
 			>
 		</div>
 	</main>

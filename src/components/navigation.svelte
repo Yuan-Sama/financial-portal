@@ -9,7 +9,7 @@
 
 	const routes = [
 		{
-			href: '/',
+			href: '/dashboard',
 			label: 'Overview'
 		},
 		{

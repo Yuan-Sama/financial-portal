@@ -64,3 +64,12 @@ export async function createAndSetAccessToken(
 		path: '/'
 	});
 }
+
+export function deleteAccessToken(cookies: Cookies) {
+	cookies.set(ACCESS_TOKEN, '', {
+		httpOnly: true,
+		sameSite: 'lax',
+		maxAge: 0,
+		path: '/'
+	});
+}

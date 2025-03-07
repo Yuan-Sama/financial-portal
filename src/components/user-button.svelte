@@ -13,6 +13,7 @@
 		DropdownMenuTrigger
 	} from './ui/dropdown-menu';
 	import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+	import { applyAction } from '$app/forms';
 
 	let { displayName }: { displayName: string } = $props();
 
@@ -36,26 +37,28 @@
 			<DropdownMenuGroupHeading>{displayName}</DropdownMenuGroupHeading>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem class="hover:cursor-pointer">
-				<User class="mr-2" />
+				<User class="mr-1" />
 				<span>Profile</span>
 			</DropdownMenuItem>
 
 			<DropdownMenuSeparator />
 
+			<!-- TODO: update logic of this -->
 			<DropdownMenuItem
-				class="hover:cursor-pointer"
-				onclick={async () => {
-					const response = await fetch('/api/log-out', {
-						method: 'POST'
-					});
-
-					const data = await response.json();
-
-					if (data.location) return await goto(data.location, { invalidateAll: true });
-				}}
+				class="hover:cursor-pointer text-destructive/80 font-bold data-[highlighted]:text-destructive w-full"
 			>
-				<LogOut class="mr-2" />
-				<span>Log out</span>
+				{#snippet child({ props })}
+					<button
+						{...props}
+						onclick={async () => {
+							await fetch('/log-out', { method: 'POST' });
+							return goto('/', { invalidateAll: true });
+						}}
+					>
+						<LogOut class="mr-1" />
+						<span>Log out</span>
+					</button>
+				{/snippet}
 			</DropdownMenuItem>
 		</DropdownMenuGroup>
 	</DropdownMenuContent>
