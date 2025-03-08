@@ -1,15 +1,15 @@
 <script lang="ts" module>
-	import type { AccountForm, Account as AccountModel } from '$lib/accounts/types';
+	import type { CategoryForm, Category as CategoryModel } from '$lib/categories/types';
 	import type { ActionResult } from '@sveltejs/kit';
 	import { PaginationState } from '$lib/state.svelte';
 
-	type Account = Omit<AccountModel, 'userId'>;
+	type Category = Omit<CategoryModel, 'userId'>;
 
-	class State extends PaginationState<Account> {
+	class State extends PaginationState<Category> {
 		open = $state(false);
-		form: AccountForm | undefined = $state();
+		form: CategoryForm | undefined = $state();
 
-		openSheet(form: AccountForm) {
+		openSheet(form: CategoryForm) {
 			this.open = true;
 			this.form = form;
 		}
@@ -29,7 +29,7 @@
 	import { toast } from 'svelte-sonner';
 	import { superForm, type FormResult } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { createAccountSchema, updateAccountSchema } from '$lib/accounts/validator';
+	import { createCategorySchema, updateCategorySchema } from '$lib/categories/validator';
 	import Metadata from '$components/metadata.svelte';
 	import { renderComponent } from '$components/ui/data-table';
 	import { Checkbox } from '$components/ui/checkbox';
@@ -44,11 +44,11 @@
 	import { Button } from '$components/ui/button';
 	import { Plus } from 'lucide-svelte';
 	import { Skeleton } from '$components/ui/skeleton';
-	import { SheetForm } from '$lib/accounts/components';
+	import { SheetForm } from '$lib/categories/components';
 
-	type OnUpdateParams = { result: Extract<ActionResult, { type: 'success' | 'failure' }> };
+	type OnUpdateProps = { result: Extract<ActionResult, { type: 'success' | 'failure' }> };
 
-	async function onUpdate({ result }: OnUpdateParams) {
+	async function onUpdate({ result }: OnUpdateProps) {
 		if (result.status === 401) {
 			await applyAction({ type: 'redirect', location: '/sign-in', status: 303 });
 			toast.error('Unauthorized');
@@ -65,7 +65,7 @@
 	let { data }: { data: PageServerData } = $props();
 
 	const createForm = superForm(data.createForm, {
-		validators: zodClient(createAccountSchema),
+		validators: zodClient(createCategorySchema),
 		onUpdate,
 		onError() {
 			if (loading) loading = false;
@@ -82,7 +82,7 @@
 	const { delayed: createState } = createForm;
 
 	const updateForm = superForm(data.updateForm, {
-		validators: zodClient(updateAccountSchema),
+		validators: zodClient(updateCategorySchema),
 		onUpdate,
 		onError() {
 			if (loading) loading = false;
@@ -118,9 +118,9 @@
 
 	const pageState = new State(data.pagination);
 
-	let loading = $state($createState || $updateState);
+	let loading = $derived($createState || $updateState);
 
-	const columns: ColumnDef<Account>[] = [
+	const columns: ColumnDef<Category>[] = [
 		{
 			id: 'select',
 			header: ({ table }) =>
@@ -161,7 +161,7 @@
 	];
 </script>
 
-<Metadata title="Financial Accounts" />
+<Metadata title="Financial Categories" />
 
 {#if loading}
 	<div class="px-4 lg:px-14 pb-10 -mt-24">
@@ -181,7 +181,7 @@
 	<div class="px-4 lg:px-14 pb-10 -mt-24">
 		<Card class="border-none drop-shadow-sm max-w-screen-2xl w-full mx-auto">
 			<CardHeader class="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
-				<CardTitle class="text-xl line-clamp-1">Accounts page</CardTitle>
+				<CardTitle class="text-xl line-clamp-1">Categories page</CardTitle>
 
 				<Button size="sm" onclick={() => pageState.openSheet(createForm)}>
 					<Plus />Add new

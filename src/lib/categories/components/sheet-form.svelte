@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AccountForm } from '../types';
+	import type { CategoryForm } from '../types';
 	import { Input } from '$components/ui/input';
 	import Spinner from '$components/spinner/spinner.svelte';
 	import { Trash } from 'lucide-svelte';
@@ -19,7 +19,7 @@
 	} from '$components/ui/form';
 
 	type Props = {
-		form: AccountForm;
+		form: CategoryForm;
 		open?: boolean;
 		loading?: boolean;
 		onOpenChange?: (value: boolean) => void;
@@ -43,11 +43,11 @@
 	<SheetContent class="space-y-4" interactOutsideBehavior={loading ? 'ignore' : 'close'}>
 		<SheetHeader>
 			{#if $formData.id}
-				<SheetTitle>Edit Account</SheetTitle>
-				<SheetDescription>Edit an existing account.</SheetDescription>
+				<SheetTitle>Edit Category</SheetTitle>
+				<SheetDescription>Edit an existing category.</SheetDescription>
 			{:else}
-				<SheetTitle>New Account</SheetTitle>
-				<SheetDescription>Create a new account to track your transactions.</SheetDescription>
+				<SheetTitle>New Category</SheetTitle>
+				<SheetDescription>Create a new category to organize your transactions.</SheetDescription>
 			{/if}
 		</SheetHeader>
 
@@ -69,7 +69,7 @@
 						<Input
 							{...props}
 							bind:value={$formData.name}
-							placeholder="e.g. Cash, Bank, Credit Card"
+							placeholder="e.g. Food, Travel, etc."
 							class="mt-2"
 							disabled={$delayed}
 						/>
@@ -80,20 +80,20 @@
 			</FormField>
 
 			<FormButton class="w-full" disabled={$delayed}>
-				{$formData.id ? 'Save Changes' : 'Create account'}
+				{$formData.id ? 'Save Changes' : 'Create category'}
 				{#if $delayed && action !== '?/delete'}
 					<Spinner class="ml-1" />
 				{/if}
 			</FormButton>
-			
-			{#if !$formData.id}
+
+			{#if $formData.id}
 				<FormButton
 					class="w-full"
 					disabled={$delayed}
 					variant="outline-red"
 					onclick={() => (action = '?/delete')}
 				>
-					<Trash />Delete account
+					<Trash />Delete category
 					{#if $delayed && action === '?/delete'}
 						<Spinner class="ml-1" variant="red" />
 					{/if}

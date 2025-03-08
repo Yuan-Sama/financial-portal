@@ -1,22 +1,19 @@
-<script lang="ts">
-	import type { Account as AccountModel, DeleteAccountsForm } from '$lib/accounts/types';
+<script lang="ts" generics="TData, TForm extends Record<string, unknown>">
 	import type { Row } from '@tanstack/table-core';
 	import { Button } from '$components/ui/button';
 	import { Trash2 } from 'lucide-svelte';
-
-	type Account = Omit<AccountModel, 'userId'>;
+	import type { SuperForm } from 'sveltekit-superforms';
 
 	type Props = {
-		selectedRows: Row<Account>[];
-		form: DeleteAccountsForm;
+		selectedRows: Row<TData>[];
+		onUpdate: (selectedRows: Row<TData>[]) => void;
+		form: SuperForm<TForm, any>;
 	};
 
-	let { selectedRows, form }: Props = $props();
+	let { selectedRows, onUpdate, form }: Props = $props();
+	const { enhance } = form;
 
-	const { enhance, form: formData } = form;
-	$effect(() => {
-		formData.update(() => ({ ids: selectedRows.map((r) => r.original.id) }));
-	});
+	$effect(() => onUpdate(selectedRows));
 </script>
 
 {#if selectedRows.length > 0}
