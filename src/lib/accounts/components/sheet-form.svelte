@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AccountForm } from './types';
+	import type { AccountForm } from '../types';
 	import { Input } from '$components/ui/input';
 	import Spinner from '$components/spinner/spinner.svelte';
 	import { Trash } from 'lucide-svelte';

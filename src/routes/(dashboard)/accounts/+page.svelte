@@ -27,24 +27,19 @@
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { applyAction } from '$app/forms';
 	import { toast } from 'svelte-sonner';
-	import { superForm, type FormResult } from 'sveltekit-superforms';
+	import { superForm, type FormPath, type FormResult } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { createAccountSchema, updateAccountSchema } from '$lib/accounts/validator';
 	import Metadata from '$components/metadata.svelte';
 	import { renderComponent } from '$components/ui/data-table';
 	import { Checkbox } from '$components/ui/checkbox';
-	import {
-		DataTable,
-		DataTableDeletesButton,
-		DataTableRowActions,
-		DataTableSortColumn
-	} from '$components/datatable';
+	import { DataTable, DataTableRowActions, DataTableSortColumn } from '$components/datatable';
 	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
 	import { Spinner } from '$components/spinner';
 	import { Button } from '$components/ui/button';
 	import { Plus } from 'lucide-svelte';
 	import { Skeleton } from '$components/ui/skeleton';
-	import SheetForm from '$lib/accounts/sheet-form.svelte';
+	import { DataTableDeletesButton, SheetForm } from '$lib/accounts/components';
 
 	type OnUpdateProps = { result: Extract<ActionResult, { type: 'success' | 'failure' }> };
 
@@ -67,11 +62,15 @@
 	const createForm = superForm(data.createForm, {
 		validators: zodClient(createAccountSchema),
 		onUpdate,
+		onError() {
+			if (loading) loading = false;
+		},
 		onUpdated({ form }) {
 			pageState.closeSheet();
 			if (form.message) {
 				toast.success(form.message);
 			}
+			if (loading) loading = false;
 		}
 	});
 
@@ -80,20 +79,41 @@
 	const updateForm = superForm(data.updateForm, {
 		validators: zodClient(updateAccountSchema),
 		onUpdate,
+		onError() {
+			if (loading) loading = false;
+		},
 		onUpdated({ form }) {
 			pageState.closeSheet();
 			if (form.message) {
 				toast.success(form.message);
 			}
+			if (loading) loading = false;
 		}
 	});
 
 	const { delayed: updateState } = updateForm;
 
+	const deletesForm = superForm(data.deletesForm, {
+		dataType: 'json',
+		onSubmit() {
+			setTimeout(() => (loading = true), 500);
+		},
+		onError() {
+			if (loading) loading = false;
+		},
+		onUpdate,
+		onUpdated({ form }) {
+			pageState.closeSheet();
+			if (form.message) {
+				toast.success(form.message);
+			}
+			if (loading) loading = false;
+		}
+	});
+
 	const pageState = new State(data.pagination);
 
-	let deletesState = $state(false);
-	let loading = $derived($createState || $updateState || deletesState);
+	let loading = $derived($createState || $updateState);
 
 	const columns: ColumnDef<Account>[] = [
 		{
@@ -142,7 +162,7 @@
 	<div class="px-4 lg:px-14 pb-10 -mt-24">
 		<Card class="border-none drop-shadow-sm">
 			<CardHeader>
-				<Skeleton class="h-8 w-48" />
+				<Skeleton class="h-8 w-52" />
 			</CardHeader>
 
 			<CardContent>
@@ -171,7 +191,7 @@
 					filterKey="name"
 				>
 					{#snippet deleteBulk(selectedRows)}
-						<DataTableDeletesButton {selectedRows} />
+						<DataTableDeletesButton {selectedRows} form={deletesForm} />
 					{/snippet}
 				</DataTable>
 			</CardContent>
@@ -190,10 +210,3 @@
 		}}
 	/>
 {/if}
-<!-- <FormSheet
-	open={pageState.open}
-	{isLoading}
-	{createForm}
-	{updateForm}
-	bind:action={pageState.action}
-/> -->
