@@ -202,6 +202,7 @@
 							onUpdate={(selectedRows) => {
 								deletesForm.form.update(() => ({ ids: selectedRows.map((r) => r.original.id) }));
 							}}
+							alertDialogDescription="You are about to delete these accounts"
 						/>
 					{/snippet}
 				</DataTable>

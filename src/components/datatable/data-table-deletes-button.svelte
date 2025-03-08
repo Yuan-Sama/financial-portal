@@ -3,27 +3,57 @@
 	import { Button } from '$components/ui/button';
 	import { Trash2 } from 'lucide-svelte';
 	import type { SuperForm } from 'sveltekit-superforms';
+	import {
+		AlertDialog,
+		AlertDialogAction,
+		AlertDialogCancel,
+		AlertDialogContent,
+		AlertDialogDescription,
+		AlertDialogFooter,
+		AlertDialogHeader,
+		AlertDialogTitle
+	} from '$components/ui/alert-dialog';
 
 	type Props = {
 		selectedRows: Row<TData>[];
 		onUpdate: (selectedRows: Row<TData>[]) => void;
 		form: SuperForm<TForm, any>;
+		alertDialogDescription?: string;
 	};
 
-	let { selectedRows, onUpdate, form }: Props = $props();
+	let { selectedRows, onUpdate, form, alertDialogDescription }: Props = $props();
 	const { enhance } = form;
+
+	let isOpen = $state(false);
 
 	$effect(() => onUpdate(selectedRows));
 </script>
 
 {#if selectedRows.length > 0}
-	<form action="?/deletes" method="post" use:enhance class="contents">
-		<Button
-			type="submit"
-			variant="outline-red"
-			class="ml-auto font-normal text-xs hover:cursor-pointer"
-		>
-			<Trash2 /> Delete ({selectedRows.length})
-		</Button>
-	</form>
+	<Button
+		variant="outline-red"
+		class="ml-auto font-normal text-xs hover:cursor-pointer"
+		onclick={() => (isOpen = true)}
+	>
+		<Trash2 /> Delete ({selectedRows.length})
+	</Button>
+
+	<AlertDialog bind:open={isOpen}>
+		<AlertDialogContent>
+			<AlertDialogHeader>
+				<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+				<AlertDialogDescription>
+					{alertDialogDescription ||
+						'This action cannot be undone. This will permanently delete selected data from servers.'}
+				</AlertDialogDescription>
+			</AlertDialogHeader>
+
+			<AlertDialogFooter>
+				<AlertDialogCancel>Cancel</AlertDialogCancel>
+				<form action="?/deletes" method="post" use:enhance class="contents">
+					<AlertDialogAction type="submit">Continue</AlertDialogAction>
+				</form>
+			</AlertDialogFooter>
+		</AlertDialogContent>
+	</AlertDialog>
 {/if}

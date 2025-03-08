@@ -17,6 +17,16 @@
 		FormFieldErrors,
 		FormLabel
 	} from '$components/ui/form';
+	import {
+		AlertDialog,
+		AlertDialogAction,
+		AlertDialogCancel,
+		AlertDialogContent,
+		AlertDialogDescription,
+		AlertDialogFooter,
+		AlertDialogHeader,
+		AlertDialogTitle
+	} from '$components/ui/alert-dialog';
 
 	type Props = {
 		form: CategoryForm;
@@ -29,10 +39,31 @@
 
 	let { form, open = $bindable(), loading = false, onOpenChange }: Props = $props();
 
-	const { enhance, form: formData, delayed } = form;
+	const { enhance, form: formData, delayed, submit } = form;
 
 	let action: Action = $state('?/create');
 	let updating = $state(Boolean($formData.id));
+	let isOpen = $state(false);
+	let promise: { resolve: (value: boolean) => void } | null = $state(null);
+
+	const confirm: () => Promise<boolean | null> = () =>
+		new Promise((resolve, _) => {
+			promise = { resolve };
+		});
+
+	const handleClose = () => {
+		promise = null;
+	};
+
+	const handleConfirm = () => {
+		promise?.resolve(true);
+		handleClose();
+	};
+
+	const handleCancel = () => {
+		promise?.resolve(false);
+		handleClose();
+	};
 
 	$effect(() => {
 		action = updating ? '?/update' : '?/create';
@@ -91,7 +122,14 @@
 					class="w-full"
 					disabled={$delayed}
 					variant="outline-red"
-					onclick={() => (action = '?/delete')}
+					onclick={async (event) => {
+						isOpen = true;
+						event.preventDefault();
+
+						const ok = await confirm();
+
+						return ok ? submit(event.currentTarget) : undefined;
+					}}
 				>
 					<Trash />Delete category
 					{#if $delayed && action === '?/delete'}
@@ -102,3 +140,26 @@
 		</form>
 	</SheetContent>
 </Sheet>
+
+<AlertDialog bind:open={isOpen}>
+	<AlertDialogContent>
+		<AlertDialogHeader>
+			<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+			<AlertDialogDescription>You are about to delete this category</AlertDialogDescription>
+		</AlertDialogHeader>
+
+		<AlertDialogFooter>
+			<AlertDialogCancel onclick={handleCancel}>Cancel</AlertDialogCancel>
+
+			<AlertDialogAction
+				onclick={() => {
+					action = '?/delete';
+					handleConfirm();
+					isOpen = false;
+				}}
+			>
+				Continue
+			</AlertDialogAction>
+		</AlertDialogFooter>
+	</AlertDialogContent>
+</AlertDialog>
