@@ -2,9 +2,9 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { zod } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms';
-import { signUpSchema } from '$lib/user/validator';
-import { createUser, getUserByUsername } from '$lib/user/server';
-import { createAndSetAccessToken } from '$lib/auth/server';
+import { signUpSchema } from '$lib/users/users.validator';
+import { createUser, getUserByUsername } from '$lib/users/users.server';
+import { createAndSetAccessToken } from '$lib/server';
 
 export const load = (async () => {
 	const form = await superValidate(zod(signUpSchema));

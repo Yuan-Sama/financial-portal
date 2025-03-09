@@ -1,15 +1,20 @@
-import type { Actions, PageServerLoad } from './$types';
+import { delay } from '$lib';
 import { fail } from '@sveltejs/kit';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms';
-import { getPageAccount } from '$lib/accounts/server';
+import type { Actions, PageServerLoad } from './$types';
 import {
 	createAccountSchema,
 	deleteAccountsSchema,
 	updateAccountSchema
-} from '$lib/accounts/validator';
-import { delay } from '$lib';
-import { db } from '$lib/db/server';
+} from '$lib/accounts/accounts.validator';
+import {
+	deleteAccount,
+	deleteAccounts,
+	getPageAccount,
+	updateAccount,
+	createAccount
+} from '$lib/accounts/accounts.server';
 
 const { DEV } = import.meta.env;
 
@@ -28,6 +33,7 @@ export const load = (async ({ parent }) => {
 export const actions = {
 	create: async ({ locals, request }) => {
 		const { user } = locals;
+
 		if (!user) return fail(401);
 
 		const createForm = await superValidate(request, zod(createAccountSchema));
@@ -36,15 +42,7 @@ export const actions = {
 
 		if (!createForm.valid) return fail(400, { createForm });
 
-		const { name } = createForm.data;
-
-		await db
-			.insertInto('accounts')
-			.values({
-				user_id: user.id,
-				name: name
-			})
-			.execute();
+		await createAccount(user.id, createForm.data);
 
 		createForm.message = 'Account created';
 
@@ -53,6 +51,7 @@ export const actions = {
 
 	update: async ({ locals, request }) => {
 		const { user } = locals;
+
 		if (!user) return fail(401);
 
 		const updateForm = await superValidate(request, zod(updateAccountSchema));
@@ -61,14 +60,7 @@ export const actions = {
 
 		if (!updateForm.valid) return fail(400, { updateForm });
 
-		const { id, name } = updateForm.data;
-
-		await db
-			.updateTable('accounts')
-			.set({ name: name })
-			.where('user_id', '=', user.id)
-			.where('id', '=', id)
-			.execute();
+		await updateAccount(user.id, updateForm.data);
 
 		updateForm.message = 'Account updated';
 
@@ -77,6 +69,7 @@ export const actions = {
 
 	delete: async ({ locals, request }) => {
 		const { user } = locals;
+
 		if (!user) return fail(401);
 
 		const updateForm = await superValidate(request, zod(updateAccountSchema));
@@ -85,16 +78,16 @@ export const actions = {
 
 		if (!updateForm.valid) return fail(400, { updateForm });
 
-		const { id } = updateForm.data;
-
-		await db.deleteFrom('accounts').where('user_id', '=', user.id).where('id', '=', id).execute();
+		await deleteAccount(user.id, { id: updateForm.data.id });
 
 		updateForm.message = 'Account deleted';
+
 		return { updateForm, pagination: await getPageAccount(user.id) };
 	},
 
 	deletes: async ({ locals, request }) => {
 		const { user } = locals;
+
 		if (!user) return fail(401);
 
 		const deletesForm = await superValidate(request, zod(deleteAccountsSchema));
@@ -103,11 +96,10 @@ export const actions = {
 
 		if (!deletesForm.valid) return fail(400);
 
-		const { ids } = deletesForm.data;
+		await deleteAccounts(user.id, deletesForm.data);
 
-		await db.deleteFrom('accounts').where('user_id', '=', user.id).where('id', 'in', ids).execute();
+		deletesForm.message = 'Accounts deleted';
 
-		deletesForm.message = `Account${ids.length > 1 ? 's' : ''} deleted`;
 		return { deletesForm, pagination: await getPageAccount(user.id) };
 	}
 } satisfies Actions;

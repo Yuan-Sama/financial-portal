@@ -1,8 +1,8 @@
-import { querySchema } from '$lib/transactions/validator';
+import { querySchema } from '$lib/transactions/transactions.validator';
 import { parse, subDays } from 'date-fns';
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/db/server';
 import type { Expression, SqlBool } from 'kysely';
+import { db } from '$lib/db/db.server';
 
 export const load = (async ({ parent, url }) => {
 	const { user } = await parent();
@@ -24,9 +24,9 @@ export const load = (async ({ parent, url }) => {
 	const endDate = to ? parse(to, 'yyyy-MM-dd', new Date()) : defaultTo;
 
 	const data = await db
-		.selectFrom('transactions as t')
-		.innerJoin('accounts as a', 'a.id', 't.account_id')
-		.leftJoin('categories as c', 'c.id', 't.category_id')
+		.selectFrom('transaction as t')
+		.innerJoin('account as a', 'a.id', 't.account_id')
+		.leftJoin('category as c', 'c.id', 't.category_id')
 		.where((eb) => {
 			const filters: Expression<SqlBool>[] = [];
 

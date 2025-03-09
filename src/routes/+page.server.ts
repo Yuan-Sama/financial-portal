@@ -1,9 +1,7 @@
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({ locals }) => {
-	const { user } = locals;
-
 	return {
-		authenticated: Boolean(user)
+		authenticated: Boolean(locals.user)
 	};
 }) satisfies PageServerLoad;

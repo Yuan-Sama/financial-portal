@@ -1,8 +1,8 @@
+import { transaction } from '$lib/db/db.schema';
 import { createInsertSchema } from 'drizzle-zod';
-import { transactions } from './schema';
 import { z } from 'zod';
 
-export const createTransactionSchema = createInsertSchema(transactions, {
+export const createTransactionSchema = createInsertSchema(transaction, {
 	date: z.coerce.date()
 });
 

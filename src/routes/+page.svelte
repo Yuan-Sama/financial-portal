@@ -1,9 +1,7 @@
 <script lang="ts" module>
 	import type { PageServerData } from './$types';
 
-	interface Props {
-		data: PageServerData;
-	}
+	type PageProps = { data: PageServerData };
 </script>
 
 <script lang="ts">
@@ -17,7 +15,7 @@
 	const description =
 		'The path to financial freedom starts with a single step. Take that step into the portal of finance and let inspiration be your compass';
 
-	let { data }: Props = $props();
+	let { data }: PageProps = $props();
 
 	const { authenticated } = data;
 </script>

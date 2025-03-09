@@ -1,9 +1,11 @@
 <script lang="ts" module>
-	import type { AccountForm, Account as AccountModel } from '$lib/accounts/types';
 	import type { ActionResult } from '@sveltejs/kit';
+	import type { Account as AccountModel } from '$lib/db/db.schema';
+	import type { AccountForm } from '$lib/accounts/components/sheet-form.svelte';
 	import { PaginationState } from '$lib/state.svelte';
 
 	type Account = Omit<AccountModel, 'userId'>;
+	type PageProps = { data: PageServerData };
 
 	class State extends PaginationState<Account> {
 		open = $state(false);
@@ -27,9 +29,9 @@
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { applyAction } from '$app/forms';
 	import { toast } from 'svelte-sonner';
-	import { superForm, type FormResult } from 'sveltekit-superforms';
+	import { superForm, type FormResult, type SuperForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { createAccountSchema, updateAccountSchema } from '$lib/accounts/validator';
+	import { createAccountSchema, updateAccountSchema } from '$lib/accounts/accounts.validator';
 	import Metadata from '$components/metadata.svelte';
 	import { renderComponent } from '$components/ui/data-table';
 	import { Checkbox } from '$components/ui/checkbox';
@@ -62,7 +64,7 @@
 		}
 	}
 
-	let { data }: { data: PageServerData } = $props();
+	let { data }: PageProps = $props();
 
 	const createForm = superForm(data.createForm, {
 		validators: zodClient(createAccountSchema),

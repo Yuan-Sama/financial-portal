@@ -8,7 +8,7 @@
 	import { Checkbox } from '$components/ui/checkbox';
 	import { Spinner } from '$components/spinner';
 	import { toast } from 'svelte-sonner';
-	import { signUpSchema } from '$lib/user/validator';
+	import { signUpSchema } from '$lib/users/users.validator';
 	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
 	import {
 		FormButton,

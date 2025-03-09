@@ -1,5 +1,6 @@
 <script lang="ts" module>
-	import type { Transaction as TransactionModel } from '$lib/transactions/types';
+	import type { PageServerData } from './$types';
+	import type { Transaction as TransactionModel } from '$lib/db/db.schema';
 	import { PaginationState } from '$lib/state.svelte';
 
 	type Transaction = Omit<
@@ -7,23 +8,24 @@
 		'accountId' | 'categoryId'
 	>;
 
+	type PageProps = { data: PageServerData };
+
 	class State extends PaginationState<Transaction> {}
 </script>
 
 <script lang="ts">
-	import type { PageServerData } from './$types';
 	import Metadata from '$components/metadata.svelte';
+	import { Plus } from 'lucide-svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
 	import { Skeleton } from '$components/ui/skeleton';
 	import { Spinner } from '$components/spinner';
 	import { Button } from '$components/ui/button';
-	import { Plus } from 'lucide-svelte';
 	import { DataTable, DataTableRowActions, DataTableSortColumn } from '$components/datatable';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent } from '$components/ui/data-table';
 	import { Checkbox } from '$components/ui/checkbox';
 
-	let { data }: { data: PageServerData } = $props();
+	let { data }: PageProps = $props();
 
 	const pageState = new State({ page: 1, pageSize: 5, totalRecords: 0, data: [] });
 

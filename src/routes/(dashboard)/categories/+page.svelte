@@ -1,6 +1,7 @@
 <script lang="ts" module>
-	import type { CategoryForm, Category as CategoryModel } from '$lib/categories/types';
+	import type { Category as CategoryModel } from '$lib/db/db.schema';
 	import type { ActionResult } from '@sveltejs/kit';
+	import type { CategoryForm } from '$lib/categories/components/sheet-form.svelte';
 	import { PaginationState } from '$lib/state.svelte';
 
 	type Category = Omit<CategoryModel, 'userId'>;
@@ -29,7 +30,7 @@
 	import { toast } from 'svelte-sonner';
 	import { superForm, type FormResult } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { createCategorySchema, updateCategorySchema } from '$lib/categories/validator';
+	import { createCategorySchema, updateCategorySchema } from '$lib/categories/categories.validator';
 	import Metadata from '$components/metadata.svelte';
 	import { renderComponent } from '$components/ui/data-table';
 	import { Checkbox } from '$components/ui/checkbox';

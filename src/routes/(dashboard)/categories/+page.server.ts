@@ -2,14 +2,19 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms';
-import { getPageCategory } from '$lib/categories/server';
+import {
+	createCategory,
+	deleteCategories,
+	deleteCategory,
+	getPageCategory,
+	updateCategory
+} from '$lib/categories/categories.server';
 import {
 	createCategorySchema,
 	deleteCategoriesSchema,
 	updateCategorySchema
-} from '$lib/categories/validator';
+} from '$lib/categories/categories.validator';
 import { delay } from '$lib';
-import { db } from '$lib/db/server';
 
 const { DEV } = import.meta.env;
 
@@ -28,6 +33,7 @@ export const load = (async ({ parent }) => {
 export const actions = {
 	create: async ({ locals, request }) => {
 		const { user } = locals;
+
 		if (!user) return fail(401);
 
 		const createForm = await superValidate(request, zod(createCategorySchema));
@@ -36,15 +42,7 @@ export const actions = {
 
 		if (!createForm.valid) return fail(400, { createForm });
 
-		const { name } = createForm.data;
-
-		await db
-			.insertInto('categories')
-			.values({
-				user_id: user.id,
-				name: name
-			})
-			.execute();
+		await createCategory(user.id, createForm.data);
 
 		createForm.message = 'Category created';
 
@@ -61,14 +59,7 @@ export const actions = {
 
 		if (!updateForm.valid) return fail(400, { updateForm });
 
-		const { id, name } = updateForm.data;
-
-		await db
-			.updateTable('categories')
-			.set({ name: name })
-			.where('user_id', '=', user.id)
-			.where('id', '=', id)
-			.execute();
+		await updateCategory(user.id, updateForm.data);
 
 		updateForm.message = 'Category updated';
 
@@ -85,11 +76,10 @@ export const actions = {
 
 		if (!updateForm.valid) return fail(400, { updateForm });
 
-		const { id } = updateForm.data;
-
-		await db.deleteFrom('categories').where('user_id', '=', user.id).where('id', '=', id).execute();
+		await deleteCategory(user.id, { id: updateForm.data.id });
 
 		updateForm.message = 'Category deleted';
+
 		return { updateForm, pagination: await getPageCategory(user.id) };
 	},
 
@@ -103,15 +93,10 @@ export const actions = {
 
 		if (!deletesForm.valid) return fail(400);
 
-		const { ids } = deletesForm.data;
+		await deleteCategories(user.id, { ids: deletesForm.data.ids });
 
-		await db
-			.deleteFrom('categories')
-			.where('user_id', '=', user.id)
-			.where('id', 'in', ids)
-			.execute();
+		deletesForm.message = `Categories deleted`;
 
-		deletesForm.message = `Categor${ids.length > 1 ? 'ies' : 'y'} deleted`;
 		return { deletesForm, pagination: await getPageCategory(user.id) };
 	}
 } satisfies Actions;

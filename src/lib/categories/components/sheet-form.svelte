@@ -1,5 +1,13 @@
+<script lang="ts" module>
+	import type { SuperForm } from 'sveltekit-superforms';
+	import type { CreateCategoryFormSchema, UpdateCategoryFormSchema } from '../categories.validator';
+
+	export type CategoryForm =
+		| SuperForm<CreateCategoryFormSchema, any>
+		| SuperForm<UpdateCategoryFormSchema, any>;
+</script>
+
 <script lang="ts">
-	import type { CategoryForm } from '../types';
 	import { Input } from '$components/ui/input';
 	import Spinner from '$components/spinner/spinner.svelte';
 	import { Trash } from 'lucide-svelte';

@@ -7,14 +7,18 @@
 </script>
 
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
 	import { applyAction } from '$app/forms';
-	import { signInSchema } from '$lib/user/validator';
-	import Spinner from '$components/spinner/spinner.svelte';
+	import { Input } from '$components/ui/input';
+	import { Label } from '$components/ui/label';
+	import { superForm } from 'sveltekit-superforms';
+	import { signInSchema } from '$lib/users/users.validator';
+	import { Checkbox } from '$components/ui/checkbox';
 	import Metadata from '$components/metadata.svelte';
+	import Spinner from '$components/spinner/spinner.svelte';
+	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
+	import ShowPasswordButton from '$components/show-password-button.svelte';
 	import {
 		FormButton,
 		FormControl,
@@ -22,10 +26,6 @@
 		FormFieldErrors,
 		FormLabel
 	} from '$components/ui/form';
-	import { Input } from '$components/ui/input';
-	import { Checkbox } from '$components/ui/checkbox';
-	import { Label } from '$components/ui/label';
-	import ShowPasswordButton from '$components/show-password-button.svelte';
 
 	let { data }: Props = $props();
 

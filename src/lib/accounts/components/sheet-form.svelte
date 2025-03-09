@@ -1,5 +1,13 @@
+<script lang="ts" module>
+	import type { SuperForm } from 'sveltekit-superforms';
+	import type { CreateAccountFormSchema, UpdateAccountFormSchema } from '../accounts.validator';
+
+	export type AccountForm =
+		| SuperForm<CreateAccountFormSchema, any>
+		| SuperForm<UpdateAccountFormSchema, any>;
+</script>
+
 <script lang="ts">
-	import type { AccountForm } from '../types';
 	import { Input } from '$components/ui/input';
 	import Spinner from '$components/spinner/spinner.svelte';
 	import { Trash } from 'lucide-svelte';
@@ -45,7 +53,7 @@
 	let updating = $state(Boolean($formData.id));
 	let isOpen = $state(false);
 	let promise: { resolve: (value: boolean) => void } | null = $state(null);
-	
+
 	const confirm: () => Promise<boolean | null> = () =>
 		new Promise((resolve, _) => {
 			promise = { resolve };
