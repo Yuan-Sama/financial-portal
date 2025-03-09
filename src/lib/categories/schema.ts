@@ -8,6 +8,6 @@ export const categories = pgTable('categories', {
 	userId: integer('user_id').notNull()
 });
 
-export const accountsRelations = relations(categories, ({ many }) => ({
+export const categoriesRelations = relations(categories, ({ many }) => ({
 	transactions: many(transactions)
 }));

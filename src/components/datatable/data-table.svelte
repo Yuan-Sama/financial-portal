@@ -23,7 +23,7 @@
 		columns: ColumnDef<TData, TValue>[];
 		filterKey: string;
 		paginationState?: PaginationState;
-		deleteBulk: Snippet<[Row<TData>[]]>;
+		deleteBulk?: Snippet<[Row<TData>[]]>;
 	};
 
 	let {
@@ -107,7 +107,7 @@
 			}}
 			class="max-w-sm"
 		/>
-		{@render deleteBulk(table.getFilteredSelectedRowModel().rows)}
+		{@render deleteBulk?.(table.getFilteredSelectedRowModel().rows)}
 	</div>
 	<div class="rounded-md border">
 		<Table.Root>
