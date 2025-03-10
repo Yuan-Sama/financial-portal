@@ -1,12 +1,11 @@
 <script lang="ts" module>
-	import type { SuperForm } from 'sveltekit-superforms';
-	import type { TransactionFormValues } from './transaction-form.svelte';
+	import type { TransactionForms } from './transaction-form.svelte';
 
 	interface Props {
 		open?: boolean;
 		onOpenChange?: (value: boolean) => void;
 		disabled?: boolean;
-		form: SuperForm<TransactionFormValues, any>;
+		form: TransactionForms;
 		accountOptions?: { id: number; name: string }[];
 	}
 </script>
