@@ -1,55 +1,43 @@
 <script lang="ts" module>
-	import type { Category as CategoryModel } from '$lib/db/db.schema';
 	import type { ActionResult } from '@sveltejs/kit';
-	import type { CategoryForm } from '$lib/categories/components/sheet-form.svelte';
-	import { PaginationState } from '$lib/state.svelte';
+	import type { ColumnDef } from '@tanstack/table-core';
+	import type { ActionData, PageServerData } from './$types';
+	import type { Category as CategoryModel } from '$lib/db/db.schema';
+	import type { CategoryForms } from '$features/categories/components/category-form.svelte';
 
 	type Category = Omit<CategoryModel, 'userId'>;
 
-	class State extends PaginationState<Category> {
-		open = $state(false);
-		form: CategoryForm | undefined = $state();
+	type OnUpdateParams = { result: Extract<ActionResult, { type: 'success' | 'failure' }> };
 
-		openSheet(form: CategoryForm) {
-			this.open = true;
-			this.form = form;
-		}
-
-		closeSheet() {
-			this.open = false;
-			this.form?.reset();
-			this.form = undefined;
-		}
-	}
+	type PageProps = { data: PageServerData };
 </script>
 
 <script lang="ts">
-	import type { ActionData, PageServerData } from './$types';
-	import type { ColumnDef } from '@tanstack/table-core';
-	import { applyAction } from '$app/forms';
 	import { toast } from 'svelte-sonner';
+	import { applyAction } from '$app/forms';
+	import Metadata from '$components/metadata.svelte';
 	import { superForm, type FormResult } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { createCategorySchema, updateCategorySchema } from '$lib/categories/categories.validator';
-	import Metadata from '$components/metadata.svelte';
 	import { renderComponent } from '$components/ui/data-table';
 	import { Checkbox } from '$components/ui/checkbox';
+	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
+	import { Button } from '$components/ui/button';
+	import { Plus } from 'lucide-svelte';
+	import CategorySheet from '$features/categories/components/category-sheet.svelte';
 	import {
 		DataTable,
 		DataTableDeletesButton,
+		DataTableLoader,
 		DataTableRowActions,
 		DataTableSortColumn
 	} from '$components/datatable';
-	import { Card, CardContent, CardHeader, CardTitle } from '$components/ui/card';
-	import { Spinner } from '$components/spinner';
-	import { Button } from '$components/ui/button';
-	import { Plus } from 'lucide-svelte';
-	import { Skeleton } from '$components/ui/skeleton';
-	import { SheetForm } from '$lib/categories/components';
+	import { get } from 'svelte/store';
+	import {
+		insertCategorySchema,
+		updateCategorySchema
+	} from '$features/categories/categories.validator';
 
-	type OnUpdateProps = { result: Extract<ActionResult, { type: 'success' | 'failure' }> };
-
-	async function onUpdate({ result }: OnUpdateProps) {
+	async function onUpdate({ result }: OnUpdateParams) {
 		if (result.status === 401) {
 			await applyAction({ type: 'redirect', location: '/sign-in', status: 303 });
 			toast.error('Unauthorized');
@@ -59,45 +47,61 @@
 		const { pagination } = result.data as FormResult<ActionData>;
 
 		if (pagination) {
-			pageState.updatePagination(pagination);
+			updatePagination(pagination);
 		}
 	}
 
-	let { data }: { data: PageServerData } = $props();
+	function updatePagination(pagination: Pagination<Category>) {
+		categories = pagination.data;
+		page = pagination.page;
+		pageSize = pagination.pageSize;
+	}
+
+	function openSheet(form: CategoryForms, data?: Category) {
+		open = true;
+		if (data) form.form.set(data);
+		currentForm = form;
+	}
+
+	function closeSheet() {
+		open = false;
+		currentForm.reset();
+	}
+
+	function onError() {
+		loading = false;
+		closeSheet();
+	}
+
+	let { data }: PageProps = $props();
 
 	const createForm = superForm(data.createForm, {
-		validators: zodClient(createCategorySchema),
+		validators: zodClient(insertCategorySchema),
 		onUpdate,
-		onError() {
-			if (loading) loading = false;
-		},
+		onError,
 		onUpdated({ form }) {
-			pageState.closeSheet();
+			loading = false;
+			closeSheet();
+
 			if (form.message) {
 				toast.success(form.message);
 			}
-			if (loading) loading = false;
 		}
 	});
-
-	const { delayed: createState } = createForm;
 
 	const updateForm = superForm(data.updateForm, {
 		validators: zodClient(updateCategorySchema),
 		onUpdate,
-		onError() {
-			if (loading) loading = false;
-		},
+		onError,
 		onUpdated({ form }) {
-			pageState.closeSheet();
+			loading = false;
+			closeSheet();
+
 			if (form.message) {
 				toast.success(form.message);
 			}
-			if (loading) loading = false;
 		}
 	});
-
-	const { delayed: updateState } = updateForm;
 
 	const deletesForm = superForm(data.deletesForm, {
 		dataType: 'json',
@@ -105,21 +109,26 @@
 			setTimeout(() => (loading = true), 500);
 		},
 		onError() {
-			if (loading) loading = false;
+			loading = false;
 		},
 		onUpdate,
 		onUpdated({ form }) {
-			pageState.closeSheet();
+			loading = false;
+
 			if (form.message) {
 				toast.success(form.message);
 			}
-			if (loading) loading = false;
 		}
 	});
 
-	const pageState = new State(data.pagination);
+	let page = $state(data.pagination.page);
+	let categories = $state(data.pagination.data);
+	let pageSize = $state(data.pagination.pageSize);
 
-	let loading = $derived($createState || $updateState);
+	let open = $state(false);
+	let currentForm: CategoryForms = $state(createForm);
+
+	let loading = $state(get(createForm.delayed) || get(updateForm.delayed));
 
 	const columns: ColumnDef<Category>[] = [
 		{
@@ -153,10 +162,7 @@
 			id: 'actions',
 			cell: ({ row }) =>
 				renderComponent(DataTableRowActions, {
-					onEdit() {
-						updateForm.form.set(row.original);
-						pageState.openSheet(updateForm);
-					}
+					onEdit: () => openSheet(updateForm, row.original)
 				})
 		}
 	];
@@ -164,35 +170,21 @@
 
 <Metadata title="Financial Categories" />
 
-{#if loading}
-	<div class="px-4 lg:px-14 pb-10 -mt-24">
-		<Card class="border-none drop-shadow-sm">
-			<CardHeader>
-				<Skeleton class="h-8 w-52" />
-			</CardHeader>
-
-			<CardContent>
-				<div class="h-[500px] w-full flex items-center justify-center">
-					<Spinner class="size-10" />
-				</div>
-			</CardContent>
-		</Card>
-	</div>
-{:else}
+<DataTableLoader {loading}>
 	<div class="px-4 lg:px-14 pb-10 -mt-24">
 		<Card class="border-none drop-shadow-sm max-w-screen-2xl w-full mx-auto">
 			<CardHeader class="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
 				<CardTitle class="text-xl line-clamp-1">Categories page</CardTitle>
 
-				<Button size="sm" onclick={() => pageState.openSheet(createForm)}>
+				<Button size="sm" onclick={() => openSheet(createForm)}>
 					<Plus />Add new
 				</Button>
 			</CardHeader>
 
 			<CardContent>
 				<DataTable
-					data={pageState.data}
-					paginationState={{ pageIndex: pageState.page - 1, pageSize: pageState.pageSize }}
+					data={categories}
+					paginationState={{ pageIndex: page - 1, pageSize }}
 					{columns}
 					filterKey="name"
 				>
@@ -210,16 +202,6 @@
 			</CardContent>
 		</Card>
 	</div>
-{/if}
+</DataTableLoader>
 
-{#if pageState.form}
-	<SheetForm
-		open={pageState.open}
-		{loading}
-		form={pageState.form}
-		onOpenChange={() => {
-			pageState.form?.reset();
-			pageState.form = undefined;
-		}}
-	/>
-{/if}
+<CategorySheet form={currentForm} bind:open />

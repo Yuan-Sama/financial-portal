@@ -4,17 +4,17 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms';
 import type { Actions, PageServerLoad } from './$types';
 import {
-	createAccountSchema,
-	deleteAccountsSchema,
-	updateAccountSchema
-} from '$lib/accounts/accounts.validator';
-import {
 	deleteAccount,
 	deleteAccounts,
 	getPageAccount,
 	updateAccount,
 	createAccount
-} from '$lib/accounts/accounts.server';
+} from '$features/accounts/accounts.server';
+import {
+	deleteAccountsSchema,
+	insertAccountSchema,
+	updateAccountSchema
+} from '$features/accounts/accounts.validator';
 
 const { DEV } = import.meta.env;
 
@@ -23,7 +23,7 @@ const { DEV } = import.meta.env;
 export const load = (async ({ parent }) => {
 	const { user } = await parent();
 
-	const createForm = await superValidate(zod(createAccountSchema));
+	const createForm = await superValidate(zod(insertAccountSchema));
 	const updateForm = await superValidate(zod(updateAccountSchema));
 	const deletesForm = await superValidate(zod(deleteAccountsSchema));
 
@@ -36,7 +36,7 @@ export const actions = {
 
 		if (!user) return fail(401);
 
-		const createForm = await superValidate(request, zod(createAccountSchema));
+		const createForm = await superValidate(request, zod(insertAccountSchema));
 
 		if (DEV) await delay(1, 5);
 

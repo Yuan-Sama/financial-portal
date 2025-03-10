@@ -75,3 +75,7 @@ export async function createAccount(userId: number, data: { name: string }) {
 		})
 		.execute();
 }
+
+export async function getAccountOptions(userId: number) {
+	return db.selectFrom('account').where('user_id', '=', userId).select(['id', 'name']).execute();
+}

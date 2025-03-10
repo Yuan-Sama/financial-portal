@@ -1,5 +1,5 @@
-import { ACCESS_TOKEN } from '$lib/server';
 import type { RequestHandler } from './$types';
+import { ACCESS_TOKEN } from '$lib/constants/server';
 
 export const POST: RequestHandler = async ({ locals, cookies }) => {
 	cookies.set(ACCESS_TOKEN, '', {

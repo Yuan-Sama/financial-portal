@@ -1,8 +1,12 @@
-import { querySchema } from '$lib/transactions/transactions.validator';
+import { querySchema } from '$features/transactions/transactions.validator';
 import { parse, subDays } from 'date-fns';
 import type { PageServerLoad } from './$types';
 import type { Expression, SqlBool } from 'kysely';
 import { db } from '$lib/db/db.server';
+import { getAccountOptions } from '$features/accounts/accounts.server';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { insertTransactionSchema } from '$features/transactions/transactions.validator';
 
 export const load = (async ({ parent, url }) => {
 	const { user } = await parent();
@@ -52,5 +56,9 @@ export const load = (async ({ parent, url }) => {
 		])
 		.execute();
 
-	return { data };
+	const accountOptions = await getAccountOptions(user.id);
+
+	const createForm = await superValidate(zod(insertTransactionSchema));
+
+	return { createForm, data, accountOptions };
 }) satisfies PageServerLoad;

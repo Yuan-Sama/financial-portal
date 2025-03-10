@@ -1,4 +1,3 @@
-import type { InferSelectModel } from 'drizzle-orm';
 import { z } from 'zod';
 
 export const signInSchema = z.object({

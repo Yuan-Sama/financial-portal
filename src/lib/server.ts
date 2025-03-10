@@ -1,8 +1,7 @@
 import type { Cookies } from '@sveltejs/kit';
 import type { User } from '$lib/db/db.schema';
-import { createToken, verifyToken } from './jwt.service';
-
-export const ACCESS_TOKEN = 'fp-access-token';
+import { createToken } from './service/jwt.server';
+import { ACCESS_TOKEN } from '$lib/constants/server';
 
 export function getExpiresAt(seconds: number = 3600 /** 1 hour */) {
 	const expiresAtMillis = Date.now() + seconds * 1000;

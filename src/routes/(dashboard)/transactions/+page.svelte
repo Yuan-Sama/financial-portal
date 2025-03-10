@@ -1,7 +1,6 @@
 <script lang="ts" module>
 	import type { PageServerData } from './$types';
 	import type { Transaction as TransactionModel } from '$lib/db/db.schema';
-	import { PaginationState } from '$lib/state.svelte';
 
 	type Transaction = Omit<
 		TransactionModel & { account: string; category: string | null },
@@ -9,8 +8,6 @@
 	>;
 
 	type PageProps = { data: PageServerData };
-
-	class State extends PaginationState<Transaction> {}
 </script>
 
 <script lang="ts">
@@ -20,16 +17,31 @@
 	import { Skeleton } from '$components/ui/skeleton';
 	import { Spinner } from '$components/spinner';
 	import { Button } from '$components/ui/button';
-	import { DataTable, DataTableRowActions, DataTableSortColumn } from '$components/datatable';
+	import {
+		DataTable,
+		DataTableLoader,
+		DataTableRowActions,
+		DataTableSortColumn
+	} from '$components/datatable';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { renderComponent } from '$components/ui/data-table';
 	import { Checkbox } from '$components/ui/checkbox';
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { insertTransactionSchema } from '$features/transactions/transactions.validator';
+	import TransactionSheet from '$features/transactions/components/transaction-sheet.svelte';
 
 	let { data }: PageProps = $props();
 
-	const pageState = new State({ page: 1, pageSize: 5, totalRecords: 0, data: [] });
+	const createForm = superForm(data.createForm, {
+		validators: zodClient(insertTransactionSchema)
+	});
+
+	let transactions = $state(data.data);
+	let accountOptions = $state(data.accountOptions);
 
 	let loading = $state(false);
+	let open = $state(false);
 
 	const columns: ColumnDef<Transaction>[] = [
 		{
@@ -71,39 +83,27 @@
 
 <Metadata title="Transactions History" />
 
-{#if loading}
-	<div class="px-4 lg:px-14 pb-10 -mt-24">
-		<Card class="border-none drop-shadow-sm">
-			<CardHeader>
-				<Skeleton class="h-8 w-52" />
-			</CardHeader>
-
-			<CardContent>
-				<div class="h-[500px] w-full flex items-center justify-center">
-					<Spinner class="size-10" />
-				</div>
-			</CardContent>
-		</Card>
-	</div>
-{:else}
+<DataTableLoader {loading}>
 	<div class="px-4 lg:px-14 pb-10 -mt-24">
 		<Card class="border-none drop-shadow-sm max-w-screen-2xl w-full mx-auto">
 			<CardHeader class="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
 				<CardTitle class="text-xl line-clamp-1">Transactions History</CardTitle>
 
-				<Button size="sm">
+				<Button size="sm" onclick={() => (open = true)}>
 					<Plus />Add new
 				</Button>
 			</CardHeader>
 
 			<CardContent>
 				<DataTable
-					data={pageState.data}
-					paginationState={{ pageIndex: pageState.page - 1, pageSize: pageState.pageSize }}
+					data={transactions}
+					paginationState={{ pageIndex: 0, pageSize: 5 }}
 					{columns}
 					filterKey="name"
 				></DataTable>
 			</CardContent>
 		</Card>
 	</div>
-{/if}
+</DataTableLoader>
+
+<TransactionSheet {open} {accountOptions} form={createForm} />

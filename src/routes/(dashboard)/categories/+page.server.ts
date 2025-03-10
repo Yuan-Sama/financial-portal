@@ -1,3 +1,4 @@
+import { delay } from '$lib';
 import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -8,13 +9,12 @@ import {
 	deleteCategory,
 	getPageCategory,
 	updateCategory
-} from '$lib/categories/categories.server';
+} from '$features/categories/categories.server';
 import {
-	createCategorySchema,
+	insertCategorySchema,
 	deleteCategoriesSchema,
 	updateCategorySchema
-} from '$lib/categories/categories.validator';
-import { delay } from '$lib';
+} from '$features/categories/categories.validator';
 
 const { DEV } = import.meta.env;
 
@@ -23,7 +23,7 @@ const { DEV } = import.meta.env;
 export const load = (async ({ parent }) => {
 	const { user } = await parent();
 
-	const createForm = await superValidate(zod(createCategorySchema));
+	const createForm = await superValidate(zod(insertCategorySchema));
 	const updateForm = await superValidate(zod(updateCategorySchema));
 	const deletesForm = await superValidate(zod(deleteCategoriesSchema));
 
@@ -36,7 +36,7 @@ export const actions = {
 
 		if (!user) return fail(401);
 
-		const createForm = await superValidate(request, zod(createCategorySchema));
+		const createForm = await superValidate(request, zod(insertCategorySchema));
 
 		if (DEV) await delay(1, 5);
 

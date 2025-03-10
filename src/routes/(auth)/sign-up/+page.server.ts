@@ -2,8 +2,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { zod } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms';
-import { signUpSchema } from '$lib/users/users.validator';
-import { createUser, getUserByUsername } from '$lib/users/users.server';
+import { signUpSchema } from '$features/users/users.validator';
+import { createUser, getUserByUsername } from '$features/users/users.server';
 import { createAndSetAccessToken } from '$lib/server';
 
 export const load = (async () => {

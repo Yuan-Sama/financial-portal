@@ -12,7 +12,7 @@
 	import { Input } from '$components/ui/input';
 	import { Label } from '$components/ui/label';
 	import { superForm } from 'sveltekit-superforms';
-	import { signInSchema } from '$lib/users/users.validator';
+	import { signInSchema } from '$features/users/users.validator';
 	import { Checkbox } from '$components/ui/checkbox';
 	import Metadata from '$components/metadata.svelte';
 	import Spinner from '$components/spinner/spinner.svelte';

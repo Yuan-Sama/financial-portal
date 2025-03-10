@@ -1,6 +1,6 @@
-import { ACCESS_TOKEN } from '$lib/server';
-import { verifyToken } from '$lib/server/jwt.service';
 import type { Handle } from '@sveltejs/kit';
+import { ACCESS_TOKEN } from '$lib/constants/server';
+import { verifyToken } from '$lib/service/jwt.server';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const { cookies, locals } = event;
